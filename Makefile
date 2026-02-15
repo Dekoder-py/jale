@@ -1,5 +1,5 @@
 build:
-	javac Jale.java -d out/
+	javac ./dev/codingcorner/jale/Jale.java -d out/
 
 run: build
 	java -cp out Jale
