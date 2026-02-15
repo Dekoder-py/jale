@@ -14,7 +14,9 @@ class Scanner {
   private int current = 0;
   private int line = 1;
 
-  Scanner(String source) { this.source = source; }
+  Scanner(String source) {
+    this.source = source;
+  }
 
   List<Token> scanTokens() {
     while (!isAtEnd()) {
@@ -29,82 +31,91 @@ class Scanner {
   private void scanToken() {
     char c = advance();
     switch (c) {
-    case '(':
-      addToken(LEFT_PAREN);
-      break;
-    case ')':
-      addToken(RIGHT_PAREN);
-      break;
-    case '{':
-      addToken(LEFT_BRACE);
-      break;
-    case '}':
-      addToken(RIGHT_BRACE);
-      break;
-    case ',':
-      addToken(COMMA);
-      break;
-    case '.':
-      addToken(DOT);
-      break;
-    case '-':
-      addToken(MINUS);
-      break;
-    case '+':
-      addToken(PLUS);
-      break;
-    case ';':
-      addToken(SEMICOLON);
-      break;
-    case '*':
-      addToken(STAR);
-      break;
-    case '!':
-      addToken(match('=') ? BANG_EQUAL : BANG);
-      break;
-    case '=':
-      addToken(match('=') ? EQUAL_EQUAL : EQUAL);
-      break;
-    case '<':
-      addToken(match('=') ? LESS_EQUAL : LESS);
-      break;
-    case '>':
-      addToken(match('=') ? GREATER_EQUAL : GREATER);
-      break;
-    case '/':
-      if (match('/')) {
-        // A comment goes until the end of the line.
-        while (peek() != '\n' && !isAtEnd())
-          advance();
-      } else {
-        addToken(SLASH);
-      }
-      break;
+      case '(':
+        addToken(LEFT_PAREN);
+        break;
+      case ')':
+        addToken(RIGHT_PAREN);
+        break;
+      case '{':
+        addToken(LEFT_BRACE);
+        break;
+      case '}':
+        addToken(RIGHT_BRACE);
+        break;
+      case ',':
+        addToken(COMMA);
+        break;
+      case '.':
+        addToken(DOT);
+        break;
+      case '-':
+        addToken(MINUS);
+        break;
+      case '+':
+        addToken(PLUS);
+        break;
+      case ';':
+        addToken(SEMICOLON);
+        break;
+      case '*':
+        addToken(STAR);
+        break;
+      case '!':
+        addToken(match('=') ? BANG_EQUAL : BANG);
+        break;
+      case '=':
+        addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+        break;
+      case '<':
+        addToken(match('=') ? LESS_EQUAL : LESS);
+        break;
+      case '>':
+        addToken(match('=') ? GREATER_EQUAL : GREATER);
+        break;
+      case '/':
+        if (match('/')) {
+          // A comment goes until the end of the line.
+          while (peek() != '\n' && !isAtEnd())
+            advance();
+        } else {
+          addToken(SLASH);
+        }
+        break;
 
-    // Ignore whitespace.
-    case ' ':
-    case '\r':
-    case '\t':
-      break;
+      // Ignore whitespace.
+      case ' ':
+      case '\r':
+      case '\t':
+        break;
 
-    // New line
-    case '\n':
-      line++;
-      break;
+      // New line
+      case '\n':
+        line++;
+        break;
 
-    // Literals
-    case '"':
-      string();
-      break;
+      // Literals
+      case '"':
+        string();
+        break;
 
-    default:
-      if (isDigit(c)) {
-        number();
-      } else {
-        Jale.error(line, "Unexpected character.");
-      }
-      break;
+      default:
+        if (isDigit(c)) {
+          number();
+        } else if (isAlpha(c)) {
+          identifier();
+        } else {
+          Jale.error(line, "Unexpected character.");
+        }
+        break;
     }
+  }
+
+  private void identifier() {
+    while (isAlphaNumeric(peek()))
+      advance();
+
+    addToken(IDENTIFIER);
   }
 
   private void number() {
@@ -160,13 +171,29 @@ class Scanner {
     return source.charAt(current + 1);
   }
 
-  private boolean isDigit(char c) { return c >= '0' && c <= '9'; }
+  private boolean isAlpha(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+  }
 
-  private boolean isAtEnd() { return current >= source.length(); }
+  private boolean isAlphaNumeric(char c) {
+    return isAlpha(c) || isDigit(c);
+  }
 
-  private char advance() { return source.charAt(current++); }
+  private boolean isDigit(char c) {
+    return c >= '0' && c <= '9';
+  }
 
-  private void addToken(TokenType type) { addToken(type, null); }
+  private boolean isAtEnd() {
+    return current >= source.length();
+  }
+
+  private char advance() {
+    return source.charAt(current++);
+  }
+
+  private void addToken(TokenType type) {
+    addToken(type, null);
+  }
 
   private void addToken(TokenType type, Object literal) {
     String text = source.substring(start, current);
