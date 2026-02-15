@@ -94,10 +94,32 @@ class Scanner {
         line++;
         break;
 
+      // Literals
+      case '"':
+        string();
+        break;
+
       default:
         Jale.error(line, "Unexpected character.");
         break;
     }
+  }
+
+  private void string() {
+    while (peek() != '"' && !isAtEnd()) {
+      if (peek() == '\n')
+        line++;
+      advance();
+    }
+
+    if (isAtEnd()) {
+      Jale.error(line, "Unterminated string.");
+      return;
+    }
+
+    advance();
+    String value = source.substring(start + 1, current - 1);
+    addToken(STRING, value);
   }
 
   private boolean match(char expected) {
