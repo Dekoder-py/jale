@@ -1,5 +1,8 @@
-build:
-	javac ./dev/codingcorner/jale/Jale.java -d out/
+build file="Jale":
+	javac ./dev/codingcorner/jale/{{file}}.java -d out/
+
+run_other file="":
+  java -cp out dev.codingcorner.jale.{{file}}
 
 run file="": build
 	java -cp out dev.codingcorner.jale.Jale {{file}}
