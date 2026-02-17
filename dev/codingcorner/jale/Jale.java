@@ -29,7 +29,8 @@ public class Jale {
   private static void runFile(String path) throws IOException {
     byte[] bytes = Files.readAllBytes(Paths.get(path));
     run(new String(bytes, Charset.defaultCharset()));
-    if (hadError) System.exit(65);
+    if (hadError)
+      System.exit(65);
   }
 
   private static void runPrompt() throws IOException {
@@ -42,7 +43,8 @@ public class Jale {
       if (line == null)
         break; // if there is no input, quit the interactive prompt.
       run(line);
-      hadError = false; // no need to kill the interactive prompt if there was an error.
+      hadError = false; // no need to kill the interactive prompt if there was
+                        // an error.
     }
   }
 
@@ -64,4 +66,11 @@ public class Jale {
     hadError = true;
   }
 
+  static void error(Token token, String message) {
+    if (token.type == TokenType.EOF) {
+      report(token.line, " at end", message);
+    } else {
+      report(token.line, " at '" + token.lexeme + "'", message);
+    }
+  }
 }
